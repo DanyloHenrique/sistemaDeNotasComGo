@@ -39,10 +39,10 @@ Ordem padrão
 ![Tela de listar alunos de forma padrao](imagens/lista.jpg)
 
 Ordenada por nome
-![Tela de listar alunos ordenada pelo nome](imagens/nome.jpg)
+![Tela de listar alunos ordenada pelo nome](imagens/porNome.jpg)
 
 Ordenada por nota decrescente
-![Tela de listar alunos ordenada pelo nota decrescente](imagens/nota.jpg)
+![Tela de listar alunos ordenada pelo nota decrescente](imagens/porNota.jpg)
 
 - **Atualizar Aluno**: O usuário pode buscar um aluno pela nome e atualizar seus dados (nome ou nota).
 ![Tela de atualizar aluno](imagens/atualizar.jpg)
@@ -52,12 +52,30 @@ Ordenada por nota decrescente
 
 ## Como Executar
 
-- **Pré-requisito**: Ter o Go instalado na máquina
+1. **Pré-requisito**: Ter o Go instalado na máquina
 
-1- git clone https://github.com/DanyloHenrique/sistemaDeNotasComGo.git
+2. **Passo a passo**
 
-2- cd sistemaDeNotasComGo
+- Clonar o repositório
 
-3- go run main.go
+```bash
+git clone https://github.com/DanyloHenrique/sistemaDeNotasComGo.git
+```
 
-4- (Opcional: gerar o executável) go build main.go
+- Encontrar a pasta do projeto
+
+```bash
+cd sistemaDeNotasComGo
+```
+
+- Executar o programa
+
+```bash
+go run main.go
+```
+
+- (Opcional) gerar o executável
+
+```bash
+go build main.go
+```
