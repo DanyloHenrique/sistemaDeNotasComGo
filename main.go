@@ -9,25 +9,25 @@ import (
 	"time"
 )
 
-type Aluno struct{
-	nome string
-	nota float64
+type Student struct{
+	name string
+	grade float64
 }
 
-type ListaAlunos struct{
-	Alunos []Aluno
+type StudentList struct{
+	Students []Student
 }
 
 //METODOS ALUNO
-func (a *Aluno) criarAluno(nome string, nota float64){
-	a.nome = nome
-	a.nota = nota
+func (a *Student) CreateStudent(name string, grade float64){
+	a.name = name
+	a.grade = grade
 }
 
 //------------------------------SYSTEM-------------------------------------
 
 // Função para limpar o terminal
-func limparTela() {
+func clearScreen() {
 	// Verifica o sistema operacional
 	switch runtime.GOOS {
 	case "windows":
@@ -41,54 +41,42 @@ func limparTela() {
 	}
 }
 
-func pausar(){
+func pause(){
 	fmt.Print("Pressione Enter para continuar...")
 	var buf [1]byte
 	os.Stdin.Read(buf[:]) // Aguarda qualquer tecla ser pressionada
 }
 
 //------------------------------ORDENAÇÃO-------------------------------------
-func insertionSortNome(alunoLista *[]Aluno){
-	// fmt.Println(*alunoLista)
-	// fmt.Println((*alunoLista)[0])
-
-	// fmt.Println(len(*alunoLista))
-
-	// time.Sleep(time.Second * 2)
+func sortStudentsByName(studentList *[]Student){
 	 i := 0
 	 j := 0
-	 aux := Aluno{}
-	 for i=0; i < len(*alunoLista); i++{
-		aux = (*alunoLista)[i]
-		for j = i; (j>0) && aux.nome < (*alunoLista)[j-1].nome; j--{
-			(*alunoLista)[j] = (*alunoLista)[j-1]
+	 aux := Student{}
+	 for i=0; i < len(*studentList); i++{
+		aux = (*studentList)[i]
+		for j = i; (j>0) && aux.name < (*studentList)[j-1].name; j--{
+			(*studentList)[j] = (*studentList)[j-1]
 		}
-		(*alunoLista)[j] = aux
+		(*studentList)[j] = aux
 	 }
 }
 
-func insertionSortNota(alunoLista *[]Aluno){
-	// fmt.Println(*alunoLista)
-	// fmt.Println((*alunoLista)[0])
-
-	// fmt.Println(len(*alunoLista))
-
-	// time.Sleep(time.Second * 2)
+func sortStudentsByGrade(studentList *[]Student){
 	 i := 0
 	 j := 0
-	 aux := Aluno{}
-	 for i=0; i < len(*alunoLista); i++{
-		aux = (*alunoLista)[i]
-		for j = i; (j>0) && aux.nota > (*alunoLista)[j-1].nota; j--{
-			(*alunoLista)[j] = (*alunoLista)[j-1]
+	 aux := Student{}
+	 for i=0; i < len(*studentList); i++{
+		aux = (*studentList)[i]
+		for j = i; (j>0) && aux.grade > (*studentList)[j-1].grade; j--{
+			(*studentList)[j] = (*studentList)[j-1]
 		}
-		(*alunoLista)[j] = aux
+		(*studentList)[j] = aux
 	 }
 }
 
 //------------------------------PROGRAMA-------------------------------------
-func imprimeMenu(){
-	limparTela()
+func printMenu(){
+	clearScreen()
 
 	fmt.Println("-------MENU--------")
 	fmt.Println("0 - Para finalizar o programa")
@@ -100,221 +88,231 @@ func imprimeMenu(){
 	fmt.Printf("\n Digite a opção desejada: ")
 }
 
-func adicionarAluno(alunoLista *[]Aluno, tamanhoLista *int){
-	limparTela()
+func addStudent(studentList *[]Student, sizeStudentList *int){
+	clearScreen()
 
-	var nome string
-	var nota float64
+	var name string
+	var grade float64
 	
 	fmt.Println("-------ADICIONAR ALUNOS--------")
 	fmt.Println("-Digite -1 a qualquer momento para voltar ao MENU-")
 
 
-	fmt.Printf("\nDigite o NOME do aluno:")
-	fmt.Scan(&nome)
-	if(nome == "-1"){
+	fmt.Printf("\nDigite o NOME do aluno: ")
+	fmt.Scan(&name)
+	if (name == "-1"){
 		return
 	}
-	fmt.Printf("\nDigite a NOTA do aluno:")
-	fmt.Scan(&nota)
+
+	studentFound, isFound := getStudentByName(*studentList, name)
+	if isFound {
+		fmt.Printf("Já existe um aluno cadastrado com esse nome!\n")
+		fmt.Printf("Aluno: %s - Nota: %0.2f", studentFound.name, studentFound.grade)
+
+		//chama a função de volta
+		time.Sleep(time.Millisecond * 1000)
+		addStudent(studentList, sizeStudentList)
+	}
+
+	
+	fmt.Printf("\nDigite a NOTA (0.0 a 10.0) do aluno: ")
+	fmt.Scan(&grade)
 
 	for {
-		if(nota == -1){
+		if(grade == -1){
 			return
 		}
 		
-		if nota >=0.00 && nota <= 10.00 {
+		if grade >=0.00 && grade <= 10.00 {
 			break
 		}
 
 		fmt.Println("Digite uma nota de 0.0 a 10.0: ")
-		fmt.Scan(&nota)
+		fmt.Scan(&grade)
 	}
 
 
 
-	novoAluno := Aluno{}//cria uma variavel do tipo Aluno
-	novoAluno.criarAluno(nome, nota)//chama o metodo de criação de aluno
-	*alunoLista = append(*alunoLista, novoAluno)//adiciona o aluno criado a lista
+	newStudent := Student{}//cria uma variavel do tipo Aluno
+	newStudent.CreateStudent(name, grade)//chama o metodo de criação de aluno
+	*studentList = append(*studentList, newStudent)//adiciona o aluno criado a lista
 
 	//verifica se o tamanho da lista aumentou em relação ao inicio da função
 	//se sim, aluno foi cadastrado na lista
-	if *tamanhoLista != len(*alunoLista){
-		fmt.Println("Aluno cadastrado com sucesso")
-		*tamanhoLista++
+	if *sizeStudentList != len(*studentList){
+		fmt.Println("Aluno cadastrado com sucesso!")
+		*sizeStudentList++
 		}else{
-			fmt.Println("Ocorreu um erro")
+			fmt.Println("Ocorreu um erro!")
 		}
 		
 	time.Sleep(time.Millisecond * 1000)
-	adicionarAluno(alunoLista, tamanhoLista)
+	addStudent(studentList, sizeStudentList)
 	
 }
 
-func listarAlunos(alunoLista []Aluno){
-	limparTela()
+func displayStudents(studentList []Student){
+	clearScreen()
 	fmt.Println("-------LISTA DE ALUNOS--------")
 	fmt.Println("-Digite -1 para voltar ao MENU-")
 	fmt.Println("-Digite 1 para ordenar por ordem alfabetica-")
-	fmt.Println("-Digite 2 para ordenar pelas notas em ordem decrescente-\n")
-	var opcao int8
+	fmt.Printf("-Digite 2 para ordenar pelas notas em ordem decrescente-\n\n")
+	var option int8
 
-	if len(alunoLista) == 0 {
+	if len(studentList) == 0 {
 		fmt.Println("Nenhum aluno cadastrado")
 		return
 	}
 
-	for index, value := range alunoLista{
-		fmt.Printf("%d - %s - nota: %.2f\n", index+1, value.nome, value.nota)
+	for index, value := range studentList{
+		fmt.Printf("%d - %s - nota: %.2f\n", index+1, value.name, value.grade)
 	}
 
-
-	fmt.Scanf("%d", &opcao)
-	fmt.Scan(&opcao)
+	fmt.Printf("\n Digite a opção desejada: ")
+	fmt.Scanf("%d", &option)
+	fmt.Scan(&option)
 	// pausar()
 
 	//usando AUX para nao modificar a lista original na ordenação
-	aux := []Aluno{}
-	aux = append(aux, alunoLista...)
+	aux := []Student{}
+	aux = append(aux, studentList...)
 
-	if(opcao == 1){
-		insertionSortNome(&aux)
-		listarAlunos(aux)
-	}else if(opcao == 2){
-		insertionSortNota(&aux)
-		listarAlunos(aux)
+	if(option == 1){
+		sortStudentsByName(&aux)
+		displayStudents(aux)
+	}else if(option == 2){
+		sortStudentsByGrade(&aux)
+		displayStudents(aux)
 	}
 
 }
 
-func pesquisarAluno(alunoLista []Aluno, nome string) (Aluno, bool) {
-	for _, value := range alunoLista{
-		if strings.ToLower(value.nome) == strings.ToLower(nome){
+func getStudentByName(studentList []Student, name string) (Student, bool) {
+	for _, value := range studentList{
+		if strings.EqualFold(value.name, name) {
 			return value, true
 		}
 	}
-	return Aluno{}, false
+	return Student{}, false
 }
 
-func deletarAluno(alunoLista *[]Aluno, tamanhoLista *int){
-	limparTela()
+func deleteStudent(studentList *[]Student, sizeStudentList *int){
+	clearScreen()
 
-	if len(*alunoLista) == 0 {
+	if len(*studentList) == 0 {
 		fmt.Println("Nenhum aluno cadastrado")
 		time.Sleep(time.Millisecond * 2000)
 		return
 	}
 
-	var nome string
+	var name string
 	fmt.Println("-------LISTA DE ALUNOS--------")
 	fmt.Println("-Digite -1 para voltar ao MENU-")
 
-	fmt.Println("Digite o nome do aluno a ser deletado")
-	fmt.Scanln(&nome)
-	fmt.Scanf("%s", &nome)
+	fmt.Printf("Digite o nome do aluno a ser deletado: ")
+	fmt.Scanln(&name)
+	fmt.Scanf("%s", &name)
 
-	if(nome == "-1"){
+	if(name == "-1"){
 		return
 	}
 	
 	//verifica se aluno existe na lista
-	alunoPesquisado, isEncontrado := pesquisarAluno(*alunoLista, nome)
-	if isEncontrado == false{
-		fmt.Println("Aluno não encontrado")
+	studentFound, isFound := getStudentByName(*studentList, name)
+	if !isFound {
+		fmt.Println("\nAluno não encontrado!")
 		time.Sleep(time.Millisecond * 2000)
 	}else{
-		aux := []Aluno{}
-		for _, value := range *alunoLista{
+		aux := []Student{}
+		for _, value := range *studentList{
 			
-			if value != alunoPesquisado{
+			if value != studentFound{
 				aux = append(aux, value)
 			}
 		}
 
-		if *tamanhoLista >= len(aux){
-			fmt.Println("Aluno deletado com sucesso!")
-			*alunoLista = aux
-			*tamanhoLista--
+		if *sizeStudentList >= len(aux){
+			fmt.Println("\nAluno deletado com sucesso!")
+			*studentList = aux
+			*sizeStudentList--
 		}
 	}
 
 
 	time.Sleep(time.Millisecond * 1000)
 	
-	deletarAluno(alunoLista, tamanhoLista)
+	deleteStudent(studentList, sizeStudentList)
 }
 
-func atualizarAluno(alunoLista *[]Aluno, tamanhoLista int){
-	limparTela()
+func updateStudent(studentList *[]Student, sizeStudentList int){
+	clearScreen()
 
-	if tamanhoLista == 0 {
+	if sizeStudentList == 0 {
 		fmt.Println("Nenhum aluno cadastrado")
 		time.Sleep(time.Millisecond * 2000)
 		return
 	}
 
-	var nome string
-	var nota float64
+	var name string
+	var grade float64
 
 	fmt.Println("-------ATUALIZAR ALUNO--------")
 	fmt.Println("-Digite -1 para voltar ao MENU-")
 
 	fmt.Print("Digite o nome do aluno a ser ATUALIZADO: ")
-	fmt.Scanln(&nome)
-	fmt.Scanf("%s", &nome)
+	fmt.Scanln(&name)
+	fmt.Scanf("%s", &name)
 
-	if(nome == "-1"){
+	if(name == "-1"){
 		return
 	}
 
 	//verifica se aluno existe na lista
-	alunoPesquisado, isEncontrado := pesquisarAluno(*alunoLista, nome)
-	if isEncontrado == false{
+	studentFound, isFound := getStudentByName(*studentList, name)
+	if !isFound {
 		fmt.Println("Aluno não encontrado")
 		time.Sleep(time.Millisecond * 2000)
-		atualizarAluno(alunoLista, tamanhoLista)
-
 	}else{
-		fmt.Println("Aluno encontrado!")
+		fmt.Printf("Aluno encontrado!\n\n")
 
-		aux := []Aluno{}
-		for _, value := range *alunoLista{
+		aux := []Student{}
+		for _, value := range *studentList{
 
-			if value != alunoPesquisado{
+			if value != studentFound{
 				aux = append(aux, value)
 			}else{
-				fmt.Print("Digite o nome atualizado do aluno: ")
-				fmt.Scanln(&nome)
-				fmt.Scanf("%s", &nome)
-				fmt.Print("Digite a nota atualizada do aluno: ")
-				fmt.Scanln(&nota)
-				fmt.Scanf("%f", &nota)
+				fmt.Print("Digite o NOVO NOME do aluno: ")
+				fmt.Scanln(&name)
+				fmt.Scanf("%s", &name)
+				fmt.Print("Digite a NOVA NOTA (0.0 a 10.0) do aluno: ")
+				fmt.Scanln(&grade)
+				fmt.Scanf("%f", &grade)
 
 				for {
-					if(nota == -1){
+					if(grade == -1){
 						return
 					}
 					
-					if nota >=0.00 && nota <= 10.00 {
+					if grade >=0.00 && grade <= 10.00 {
 						break
 					}
 			
 					fmt.Println("Digite uma nota de 0.0 a 10.0: ")
-					fmt.Scan(&nota)
+					fmt.Scan(&grade)
 				}
 				
-				alunoAtualizado := Aluno{nome: nome, nota: nota}
-				aux = append(aux, alunoAtualizado)
+				updatedStudent := Student{name: name, grade: grade}
+				aux = append(aux, updatedStudent)
 
 
 
 			}
 		}
 
-		if tamanhoLista == len(aux){
-			fmt.Println("Aluno atualizado com sucesso")
+		if sizeStudentList == len(aux){
+			fmt.Printf("Aluno atualizado com sucesso!\n\n")
 			time.Sleep(time.Millisecond * 2000)
-			*alunoLista = aux
+			*studentList = aux
 		}
 	}
 
@@ -322,29 +320,29 @@ func atualizarAluno(alunoLista *[]Aluno, tamanhoLista int){
 
 func main(){
 	//criando lista do tipo aluno
-	alunosLista := []Aluno{}
+	studentList := []Student{}
 	
 	//povoando a lista
-	a1 := Aluno{nome: "Emily", nota: 10}
-	a2 := Aluno{nome: "Danylo", nota: 7}
+	a1 := Student{name: "Emily", grade: 10}
+	a2 := Student{name: "Danylo", grade: 7}
 
-	alunosLista = append(alunosLista, a1, a2)
+	studentList = append(studentList, a1, a2)
 	//controle do tamanho da lista
-	tamanhoLista := len(alunosLista)
-	var ptrTamanhoLista *int = &tamanhoLista
+	sizeStudentList := len(studentList)
+	var pointerSizeStudentList *int = &sizeStudentList
 
 	//estrutura de escolha
-	var opcao int
-	for ok := true; ok; ok = (opcao  != 0){
-		imprimeMenu()
-		fmt.Scan(&opcao)
+	var option int
+	for ok := true; ok; ok = (option  != 0){
+		printMenu()
+		fmt.Scan(&option)
 
-		switch opcao{
+		switch option{
 			case 0: break
-			case 1: adicionarAluno(&alunosLista, ptrTamanhoLista)
-			case 2: listarAlunos(alunosLista)
-			case 3: deletarAluno(&alunosLista, ptrTamanhoLista)
-			case 4: atualizarAluno(&alunosLista, *ptrTamanhoLista)
+			case 1: addStudent(&studentList, pointerSizeStudentList)
+			case 2: displayStudents(studentList)
+			case 3: deleteStudent(&studentList, pointerSizeStudentList)
+			case 4: updateStudent(&studentList, *pointerSizeStudentList)
 			default: fmt.Println("Valor invalido")
 		}
 	}	
